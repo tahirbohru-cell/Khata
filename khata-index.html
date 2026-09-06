@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#efece6">
+<meta name="color-scheme" content="light dark">
+<title>KHATA</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="KHATA">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#efece6; --ink:#1a1614; --mut:#736a62;
+  --acc:#8c1d3f; --accbg:rgba(140,29,63,.09); --acc2:#6d1530;
+  --in:#15803d; --inbg:rgba(21,128,61,.10);
+  --bad:#b3261e; --warn:#8a5a08;
+  --card:rgba(255,255,255,.70); --card2:rgba(255,255,255,.45);
+  --solid:#fffdfa; --inset:rgba(26,22,20,.045);
+  --line:rgba(26,22,20,.11); --hair:rgba(26,22,20,.09); --edge:rgba(255,255,255,.8);
+  --track:rgba(26,22,20,.12);
+  --glass:rgba(250,248,244,.80); --sheet:rgba(250,248,244,.94);
+  --blur:saturate(170%) blur(20px);
+  --sh:0 1px 1px rgba(26,22,20,.04), 0 6px 18px rgba(26,22,20,.05);
+  --tap:46px; --r:14px;
+}
+[data-theme="dark"]{
+  --bg:#14110f; --ink:#eee9e3; --mut:#9a918a;
+  --acc:#e56a8c; --accbg:rgba(229,106,140,.14); --acc2:#f2a0b7;
+  --in:#5fd18c; --inbg:rgba(95,209,140,.13);
+  --bad:#f08a80; --warn:#e0b24a;
+  --card:rgba(38,33,30,.66); --card2:rgba(255,255,255,.06);
+  --solid:#1d1917; --inset:rgba(255,255,255,.05);
+  --line:rgba(255,255,255,.11); --hair:rgba(255,255,255,.10); --edge:rgba(255,255,255,.08);
+  --track:rgba(255,255,255,.15);
+  --glass:rgba(26,22,20,.80); --sheet:rgba(24,20,18,.95);
+  --sh:0 1px 1px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  color:var(--ink); background:transparent;
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums; -webkit-text-size-adjust:100%;
+  padding:calc(env(safe-area-inset-top) + 50px) 0 calc(env(safe-area-inset-bottom) + 66px);
+  overscroll-behavior-y:contain;
+}
+/* faint ruled paper, fixed so it never scrolls */
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,transparent 0 27px,var(--hair) 27px 28px);
+  opacity:.30}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:active{opacity:.72}
+input,select,textarea{font-size:16px;font-family:inherit;color:var(--ink);background:var(--card2);
+  border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select{-webkit-appearance:none;appearance:none}
+.wrap{max-width:600px;margin:0 auto;padding:0 12px}
+.mut{color:var(--mut)}
+.sm{font-size:12.5px}.xs{font-size:11.5px}.b{font-weight:700}
+.row{display:flex;gap:8px;align-items:center}
+.grow{flex:1;min-width:0}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.right{text-align:right}
+.money{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.pos{color:var(--in)}
+/* ---------- app bar ---------- */
+#bar{position:fixed;top:0;left:0;right:0;z-index:40;background:var(--glass);
+  border-bottom:1px solid var(--hair);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding-top:env(safe-area-inset-top)}
+#bar .in{max-width:600px;margin:0 auto;height:50px;display:flex;align-items:center;gap:10px;padding:0 12px}
+#bar h1{font-size:16px;font-weight:800;letter-spacing:.10em}
+#bar h1 span{color:var(--acc)}
+.iconbtn{min-width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);background:var(--card2);font-size:15px}
+/* ---------- bottom nav ---------- */
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--glass);
+  border-top:1px solid var(--hair);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding-bottom:env(safe-area-inset-bottom)}
+#nav .in{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+#nav button{height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:10px;font-weight:700;color:var(--mut)}
+#nav button i{font-style:normal;font-size:17px;line-height:1}
+#nav button[aria-selected="true"]{color:var(--acc)}
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--hair);border-radius:var(--r);
+  box-shadow:var(--sh),inset 0 1px 0 var(--edge);
+  -webkit-backdrop-filter:saturate(150%) blur(12px);backdrop-filter:saturate(150%) blur(12px);
+  padding:13px;margin:11px 0}
+.card.tight{padding:10px}
+.sheet .card{background:var(--inset);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.ttl{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mut);margin-bottom:8px}
+.btn{min-height:var(--tap);padding:0 15px;border-radius:12px;background:var(--acc);color:#fff;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent}
+[data-theme="dark"] .btn{color:#200d14}
+.btn.ghost{background:var(--card2);color:var(--ink);border-color:var(--line)}
+.btn.dang{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.sm2{min-height:36px;padding:0 11px;font-size:13px;border-radius:10px}
+.btn.full{width:100%}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.4}
+/* ---------- amount display + pad ---------- */
+#amtwrap{display:flex;align-items:baseline;justify-content:center;gap:4px;padding:10px 0 4px}
+#amtcur{font-size:24px;font-weight:600;color:var(--mut)}
+#amt{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+#amt.zero{color:var(--mut);opacity:.45}
+#kindsw{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--inset);padding:4px;border-radius:12px}
+#kindsw button{height:38px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--mut)}
+#kindsw button[aria-selected="true"]{background:var(--solid);color:var(--ink);box-shadow:var(--sh)}
+#kindsw button[aria-selected="true"][data-k="i"]{color:var(--in)}
+#pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+#pad button{height:52px;border-radius:12px;background:var(--card2);border:1px solid var(--hair);
+  font-size:21px;font-weight:600}
+#pad button.act{background:var(--accbg);color:var(--acc);font-size:17px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:999px;
+  background:var(--card2);border:1px solid var(--line);font-size:13px;font-weight:600;white-space:nowrap}
+.chip[aria-selected="true"]{background:var(--accbg);border-color:var(--acc);color:var(--acc)}
+.chip[aria-selected="true"].ink{background:var(--inbg);border-color:var(--in);color:var(--in)}
+/* ---------- ledger list ---------- */
+.day{margin:14px 0 0}
+.dayh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:0 2px 5px;border-bottom:1px solid var(--hair)}
+.dayh .d{font-size:12.5px;font-weight:800}
+.dayh .t{font-size:12.5px;color:var(--mut)}
+/* the maroon margin rule - the one flourish, borrowed from a bahi khata's ruled column */
+.entries{border-left:2px solid var(--acc);padding-left:10px;margin-top:2px}
+.ent{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--hair);width:100%;text-align:left}
+.ent:last-child{border-bottom:0}
+.ent .ic{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--inset);
+  display:flex;align-items:center;justify-content:center;font-size:15px}
+.ent .nm{font-size:14px;font-weight:600}
+.ent .nt{font-size:11.5px;color:var(--mut)}
+.ent .am{font-size:14.5px;font-weight:700;white-space:nowrap}
+/* ---------- period switcher ---------- */
+#seg,.seg{display:grid;gap:4px;background:var(--inset);padding:3px;border-radius:11px}
+#seg{grid-template-columns:repeat(4,1fr)}
+.seg button,#seg button{height:32px;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--mut)}
+.seg button[aria-selected="true"],#seg button[aria-selected="true"]{background:var(--solid);color:var(--ink);box-shadow:var(--sh)}
+.pnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px}
+.pnav .lbl{font-size:14px;font-weight:700}
+.pnav button{width:36px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--card2);font-size:15px}
+.pnav button[disabled]{opacity:.3}
+/* ---------- figures ---------- */
+.big{font-size:32px;font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.trio .k{font-size:10.5px;font-weight:700;color:var(--mut);letter-spacing:.05em}
+.trio .v{font-size:15.5px;font-weight:800;margin-top:2px}
+/* ---------- bars ---------- */
+.brow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:7px 0;
+  border-bottom:1px solid var(--hair)}
+.brow:last-child{border-bottom:0}
+.btrack{grid-column:1/-1;height:6px;border-radius:999px;background:var(--track);overflow:hidden}
+.bfill{height:100%;border-radius:999px;background:var(--acc)}
+.spark{display:flex;align-items:flex-end;gap:5px;height:88px;margin-top:6px}
+.spark .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+.spark .bx{width:100%;border-radius:5px 5px 2px 2px;background:var(--accbg);border:1px solid var(--acc);min-height:2px}
+.spark .col.now .bx{background:var(--acc)}
+.spark .lb{font-size:9.5px;color:var(--mut);font-weight:700}
+/* ---------- sheet ---------- */
+#scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.34);display:none}
+#scrim.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--sheet);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-radius:18px 18px 0 0;border-top:1px solid var(--hair);
+  max-height:88vh;overflow:auto;padding:12px 12px calc(env(safe-area-inset-bottom) + 16px);display:none}
+.sheet.on{display:block}
+.sheeth{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sheeth h3{font-size:16px;font-weight:800;flex:1}
+.fld{margin:9px 0}
+.fld label{display:block;font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:4px}
+/* ---------- toast ---------- */
+#toast{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 72px);z-index:70;
+  background:var(--sheet);border:1px solid var(--hair);border-radius:13px;box-shadow:var(--sh);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding:11px 13px;display:flex;align-items:center;gap:10px}
+#toastM{flex:1;font-size:13.5px;font-weight:600}
+.empty{text-align:center;padding:34px 16px;color:var(--mut)}
+.empty .e1{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="bar"><div class="in">
+  <h1>KH<span>A</span>TA</h1>
+  <div class="grow"></div>
+  <button class="iconbtn" id="themeBtn" aria-label="Change theme">◐</button>
+</div></div>
+
+<main class="wrap">
+  <section id="v-add"></section>
+  <section id="v-log" hidden></section>
+  <section id="v-tre" hidden></section>
+  <section id="v-set" hidden></section>
+</main>
+
+<div id="nav"><div class="in">
+  <button data-v="add" aria-selected="true"><i>＋</i>Add</button>
+  <button data-v="log" aria-selected="false"><i>☰</i>Ledger</button>
+  <button data-v="tre" aria-selected="false"><i>▤</i>Trends</button>
+  <button data-v="set" aria-selected="false"><i>⚙</i>Setup</button>
+</div></div>
+
+<div id="scrim"></div>
+<div class="sheet" id="sheet"></div>
+<div id="toast" hidden><span id="toastM"></span><button class="btn sm2 ghost" id="toastB" hidden>Undo</button></div>
+
+<script>
+/* ==========================================================================
+   KHATA - offline expense and income ledger.
+
+   Everything lives in localStorage on this device. Nothing is sent anywhere:
+   there is no server, no account, no sync. That is a deliberate constraint,
+   not a missing feature - it is what lets the app open and record an entry
+   with no signal at all, which is the only condition that matters when you
+   are standing at a counter having just paid for something.
+   ========================================================================== */
+'use strict';
+var KEY='khata.v1';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+
+/* ---------- money ----------
+   Amounts are held as integer paise, never as floating point rupees. 12.10 + 0.05
+   in binary floating point is not 12.15, and a ledger that drifts by a paise per
+   entry is a ledger you stop trusting. Convert at the edges only. */
+function toP(rupees){return Math.round(Number(rupees||0)*100)}
+function fromP(p){return (p||0)/100}
+function fmt(p,showPaise){
+  var neg=p<0, v=Math.abs(p)/100;
+  var s=showPaise||(Math.abs(p)%100!==0) ? v.toFixed(2) : String(Math.round(v));
+  /* Indian grouping: last three digits, then pairs. 12,34,567 not 1,234,567. */
+  var parts=s.split('.'), n=parts[0], tail=parts[1]?'.'+parts[1]:'';
+  if(n.length>3){
+    var last3=n.slice(-3), rest=n.slice(0,-3);
+    n=rest.replace(/\B(?=(\d{2})+(?!\d))/g,',')+','+last3;
+  }
+  return (neg?'-':'')+n+tail;
+}
+function cur(){return S.cur||'\u20b9'}
+/* Sign goes outside the symbol: -₹1,089 reads as a negative amount, ₹-1,089 reads
+   like a typo. */
+function money(p,showPaise){return (p<0?'\u2212':'')+cur()+fmt(Math.abs(p),showPaise)}
+/* Derived figures - averages, differences - are rounded to whole rupees. Paise are
+   real in a recorded amount and noise in a statistic. */
+function moneyR(p){return money(Math.round(p/100)*100)}
+
+/* ---------- dates (all local, no UTC anywhere) ---------- */
+function pad2(n){return n<10?'0'+n:''+n}
+function iso(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+function today(){return iso(new Date())}
+function parseISO(s){var a=String(s).split('-');return new Date(+a[0],+a[1]-1,+a[2])}
+function addDays(d,n){var x=new Date(d.getTime());x.setDate(x.getDate()+n);return x}
+function addMonths(d,n){var x=new Date(d.getFullYear(),d.getMonth()+n,1);return x}
+/* Weeks start Monday - the Sunday-start default is a US convention and makes
+   "this week" read wrong for everyone who plans Monday to Sunday. */
+function weekStart(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  var dow=(x.getDay()+6)%7; return addDays(x,-dow)}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function dayLabel(isoStr){
+  var d=parseISO(isoStr), t=today();
+  if(isoStr===t)return 'Today';
+  if(isoStr===iso(addDays(new Date(),-1)))return 'Yesterday';
+  var sameYear=d.getFullYear()===new Date().getFullYear();
+  return DOW[(d.getDay()+6)%7]+' '+d.getDate()+' '+MON[d.getMonth()]+(sameYear?'':' '+d.getFullYear());
+}
+
+/* ---------- state ---------- */
+var DEF={
+  v:1, cur:'\u20b9', theme:'auto',
+  cats:[
+    {id:'c1',name:'Food',ic:'\ud83c\udf5b',k:'e'},
+    {id:'c2',name:'Transport',ic:'\ud83d\ude8c',k:'e'},
+    {id:'c3',name:'Groceries',ic:'\ud83e\uddfa',k:'e'},
+    {id:'c4',name:'Mobile',ic:'\ud83d\udcf1',k:'e'},
+    {id:'c5',name:'Study',ic:'\ud83d\udcda',k:'e'},
+    {id:'c6',name:'Rent',ic:'\ud83c\udfe0',k:'e'},
+    {id:'c7',name:'Health',ic:'\ud83d\udc8a',k:'e'},
+    {id:'c8',name:'Clothes',ic:'\ud83d\udc55',k:'e'},
+    {id:'c9',name:'Fun',ic:'\ud83c\udfae',k:'e'},
+    {id:'c10',name:'Other',ic:'\u2022',k:'e'},
+    {id:'i1',name:'Allowance',ic:'\ud83d\udcb5',k:'i'},
+    {id:'i2',name:'Stipend',ic:'\ud83c\udf93',k:'i'},
+    {id:'i3',name:'Gift',ic:'\ud83c\udf81',k:'i'},
+    {id:'i4',name:'Other',ic:'\u2022',k:'i'}
+  ],
+  tx:[], rec:[]
+};
+var S=null, undoSnap=null, undoT=null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function load(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw){S=JSON.parse(JSON.stringify(DEF));return}
+    var o=JSON.parse(raw);
+    S=JSON.parse(JSON.stringify(DEF));
+    for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k))S[k]=o[k];
+    if(!S.cats||!S.cats.length)S.cats=DEF.cats.slice();
+    if(!S.tx)S.tx=[]; if(!S.rec)S.rec=[];
+  }catch(e){ S=JSON.parse(JSON.stringify(DEF)); }
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}
+  catch(e){toast('Could not save - device storage is full')}
+}
+function mark(label){try{undoSnap={label:label,json:JSON.stringify(S)}}catch(e){undoSnap=null}}
+function doUndo(){
+  if(!undoSnap)return;
+  try{S=JSON.parse(undoSnap.json)}catch(e){return}
+  undoSnap=null; $('#toast').hidden=true; save(); render(); toast('Undone');
+}
+function toast(msg,undoable){
+  var t=$('#toast'); $('#toastM').textContent=msg;
+  t.hidden=false; $('#toastB').hidden=!undoable;
+  if(undoT)clearTimeout(undoT);
+  undoT=setTimeout(function(){t.hidden=true;undoT=null}, undoable?7000:2400);
+}
+
+/* ---------- lookups ---------- */
+function catOf(id){for(var i=0;i<S.cats.length;i++)if(S.cats[i].id===id)return S.cats[i];return null}
+function catName(id){var c=catOf(id);return c?c.name:'Uncategorised'}
+function catIc(id){var c=catOf(id);return c?c.ic:'\u2022'}
+function catsOf(k){return S.cats.filter(function(c){return c.k===k})}
+
+/* ---------- recurring ----------
+   Posted when the app opens, never retroactively before the entry was created:
+   a new recurring item starts from the month you add it. Each item remembers the
+   last month it fired so reopening the app twice in a day cannot double-post. */
+function monthKey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)}
+function daysIn(y,m){return new Date(y,m+1,0).getDate()}
+function runRecurring(){
+  if(!S.rec.length)return 0;
+  var now=new Date(), posted=0;
+  for(var i=0;i<S.rec.length;i++){
+    var r=S.rec[i];
+    if(!r.last){r.last=monthKey(now); var dd=Math.min(r.day,daysIn(now.getFullYear(),now.getMonth()));
+      if(dd<=now.getDate()){S.tx.push({id:uid(),d:iso(new Date(now.getFullYear(),now.getMonth(),dd)),p:r.p,c:r.c,k:r.k,n:r.name,r:1});posted++}
+      continue;}
+    var cursor=parseISO(r.last+'-01');
+    while(monthKey(cursor)<monthKey(now)){
+      cursor=addMonths(cursor,1);
+      var y=cursor.getFullYear(), m=cursor.getMonth();
+      var day=Math.min(r.day,daysIn(y,m));
+      var when=new Date(y,m,day);
+      if(when>now)break;
+      S.tx.push({id:uid(),d:iso(when),p:r.p,c:r.c,k:r.k,n:r.name,r:1});
+      posted++; r.last=monthKey(cursor);
+    }
+  }
+  if(posted)save();
+  return posted;
+}
+
+/* ---------- periods ---------- */
+var PER={d:'Day',w:'Week',m:'Month',y:'Year'};
+function range(mode,anchor){
+  var y=anchor.getFullYear(), m=anchor.getMonth();
+  if(mode==='d')return {from:iso(anchor),to:iso(anchor),label:dayLabel(iso(anchor))};
+  if(mode==='w'){
+    var ws=weekStart(anchor), we=addDays(ws,6);
+    var l=ws.getDate()+' '+MON[ws.getMonth()]+' \u2013 '+we.getDate()+' '+MON[we.getMonth()];
+    return {from:iso(ws),to:iso(we),label:l};
+  }
+  if(mode==='m')return {from:iso(new Date(y,m,1)),to:iso(new Date(y,m+1,0)),label:MON[m]+' '+y};
+  return {from:y+'-01-01',to:y+'-12-31',label:String(y)};
+}
+function shift(mode,anchor,n){
+  if(mode==='d')return addDays(anchor,n);
+  if(mode==='w')return addDays(anchor,7*n);
+  if(mode==='m')return new Date(anchor.getFullYear(),anchor.getMonth()+n,1);
+  return new Date(anchor.getFullYear()+n,0,1);
+}
+function inRange(t,r){return t.d>=r.from&&t.d<=r.to}
+function pick(r){return S.tx.filter(function(t){return inRange(t,r)})}
+function sum(list,k){var s=0;for(var i=0;i<list.length;i++)if(list[i].k===k)s+=list[i].p;return s}
+function spanDays(r){return Math.round((parseISO(r.to)-parseISO(r.from))/86400000)+1}
+
+/* ---------- routing ---------- */
+var view='add';
+function go(v){
+  view=v;
+  $$('#nav button').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.v===v))});
+  ['add','log','tre','set'].forEach(function(x){$('#v-'+x).hidden=(x!==v)});
+  render();
+  window.scrollTo(0,0);
+}
+function render(){
+  if(view==='add')renderAdd();
+  else if(view==='log')renderLog();
+  else if(view==='tre')renderTre();
+  else renderSet();
+}
+function plural(n,one,many){return n+' '+(n===1?one:many)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ================= ADD ================= */
+var draft={buf:'',k:'e',c:null,d:null,n:''};
+function padVal(){return draft.buf===''?0:toP(draft.buf)}
+function renderAdd(){
+  if(!draft.d)draft.d=today();
+  var list=catsOf(draft.k);
+  if(!draft.c||!catOf(draft.c)||catOf(draft.c).k!==draft.k)draft.c=list.length?list[0].id:null;
+
+  var tR=range('d',new Date()), mR=range('m',new Date());
+  var tOut=sum(pick(tR),'e'), mOut=sum(pick(mR),'e'), mIn=sum(pick(mR),'i');
+
+  var shown=draft.buf===''?'0':draft.buf;
+  var h='';
+  h+='<div class="card tight"><div class="trio">'
+   + '<div><div class="k">Today out</div><div class="v money">'+money(tOut)+'</div></div>'
+   + '<div><div class="k">'+MON[new Date().getMonth()]+' out</div><div class="v money">'+money(mOut)+'</div></div>'
+   + '<div><div class="k">'+MON[new Date().getMonth()]+' net</div><div class="v money '+((mIn-mOut)>=0?'pos':'')+'">'+money(mIn-mOut)+'</div></div>'
+   + '</div></div>';
+
+  h+='<div class="card">';
+  h+='<div id="kindsw">'
+   + '<button data-act="kind" data-k="e" aria-selected="'+(draft.k==='e')+'">Spent</button>'
+   + '<button data-act="kind" data-k="i" aria-selected="'+(draft.k==='i')+'">Received</button></div>';
+  h+='<div id="amtwrap"><span id="amtcur">'+cur()+'</span>'
+   + '<span id="amt" class="'+(draft.buf===''?'zero':'')+'">'+esc(shown)+'</span></div>';
+
+  h+='<div class="chips" id="catchips">';
+  list.forEach(function(c){
+    h+='<button class="chip'+(draft.k==='i'?' ink':'')+'" data-act="cat" data-id="'+c.id+'" aria-selected="'+(draft.c===c.id)+'">'
+     + '<span>'+esc(c.ic)+'</span>'+esc(c.name)+'</button>';
+  });
+  h+='<button class="chip" data-act="newcat">+ New</button></div>';
+
+  h+='<div class="chips" style="margin-top:2px">'
+   + '<button class="chip" data-act="date" data-d="'+today()+'" aria-selected="'+(draft.d===today())+'">Today</button>'
+   + '<button class="chip" data-act="date" data-d="'+iso(addDays(new Date(),-1))+'" aria-selected="'+(draft.d===iso(addDays(new Date(),-1)))+'">Yesterday</button>'
+   + '<button class="chip" data-act="pickdate" aria-selected="'+(draft.d!==today()&&draft.d!==iso(addDays(new Date(),-1)))+'">'
+   + (draft.d!==today()&&draft.d!==iso(addDays(new Date(),-1))?esc(dayLabel(draft.d)):'Other day')+'</button>'
+   + '<button class="chip" data-act="note" aria-selected="'+(!!draft.n)+'">'+(draft.n?'\u270e '+esc(draft.n):'+ Note')+'</button>'
+   + '</div>';
+
+  h+='<div id="pad">';
+  ['1','2','3','4','5','6','7','8','9','.','0'].forEach(function(t){
+    h+='<button data-act="key" data-t="'+t+'">'+t+'</button>';
+  });
+  h+='<button class="act" data-act="key" data-t="back">\u232b</button></div>';
+  h+='<button class="btn full" style="margin-top:10px" data-act="saveTx"'+(padVal()<=0?' disabled':'')+'>'
+   + (draft.k==='e'?'Record spend':'Record income')+'</button>';
+  h+='</div>';
+
+  var recent=S.tx.slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0}).slice(0,5);
+  if(recent.length){
+    h+='<div class="card"><div class="ttl">Latest entries</div><div class="entries">';
+    recent.forEach(function(t){h+=entRow(t)});
+    h+='</div></div>';
+  }
+  $('#v-add').innerHTML=h;
+}
+function entRow(t){
+  return '<button class="ent" data-act="edit" data-id="'+t.id+'">'
+    + '<span class="ic">'+esc(catIc(t.c))+'</span>'
+    + '<span class="grow ell"><span class="nm">'+esc(catName(t.c))+'</span>'
+    + (t.n?'<br><span class="nt ell">'+esc(t.n)+'</span>':'')+'</span>'
+    + '<span class="am money'+(t.k==='i'?' pos':'')+'">'+(t.k==='i'?'+':'')+money(t.p)+'</span></button>';
+}
+function keyPress(t){
+  if(t==='back'){draft.buf=draft.buf.slice(0,-1);}
+  else if(t==='.'){ if(draft.buf.indexOf('.')<0)draft.buf=(draft.buf===''?'0':draft.buf)+'.'; }
+  else{
+    var dot=draft.buf.indexOf('.');
+    if(dot>=0&&draft.buf.length-dot>2)return;      /* two decimal places, no more */
+    if(dot<0&&draft.buf.replace('.','').length>=9)return;
+    draft.buf=(draft.buf==='0'?'':draft.buf)+t;
+  }
+  renderAdd();
+}
+function saveTx(){
+  var p=padVal(); if(p<=0)return;
+  mark('entry');
+  S.tx.push({id:uid(),d:draft.d,p:p,c:draft.c,k:draft.k,n:draft.n});
+  save();
+  var was=draft.k;
+  draft.buf=''; draft.n='';
+  renderAdd();
+  toast((was==='i'?'Income':'Spend')+' of '+money(p)+' recorded',true);
+}
+
+/* ================= LEDGER ================= */
+var logMode='m', logAnchor=new Date(), logQ='';
+function renderLog(){
+  var r=range(logMode,logAnchor);
+  var rows=pick(r);
+  if(logQ){
+    var q=logQ.toLowerCase();
+    rows=rows.filter(function(t){
+      return catName(t.c).toLowerCase().indexOf(q)>=0 || String(t.n||'').toLowerCase().indexOf(q)>=0;
+    });
+  }
+  var out=sum(rows,'e'), inc=sum(rows,'i');
+  var atNow=range(logMode,new Date()).from===r.from;
+
+  var h='<div class="card tight">';
+  h+='<div id="seg">'+['d','w','m','y'].map(function(k){
+    return '<button data-act="lmode" data-m="'+k+'" aria-selected="'+(logMode===k)+'">'+PER[k]+'</button>';
+  }).join('')+'</div>';
+  h+='<div class="pnav"><button data-act="lshift" data-n="-1">\u2039</button>'
+   + '<span class="lbl">'+esc(r.label)+'</span>'
+   + '<button data-act="lshift" data-n="1"'+(atNow?' disabled':'')+'>\u203a</button></div>';
+  h+='</div>';
+
+  h+='<div class="card tight"><div class="trio">'
+   + '<div><div class="k">Out</div><div class="v money">'+money(out)+'</div></div>'
+   + '<div><div class="k">In</div><div class="v money pos">'+money(inc)+'</div></div>'
+   + '<div><div class="k">Net</div><div class="v money '+((inc-out)>=0?'pos':'')+'">'+money(inc-out)+'</div></div>'
+   + '</div></div>';
+
+  h+='<div style="margin:10px 0"><input id="logq" placeholder="Search category or note" value="'+esc(logQ)+'"></div>';
+
+  if(!rows.length){
+    h+='<div class="empty"><div class="e1">'+(logQ?'Nothing matches that':'No entries in this period')+'</div>'
+     + '<div class="sm">'+(logQ?'Try a different word.':'Entries you record will be listed here.')+'</div></div>';
+  }else{
+    var byDay={}, days=[];
+    rows.forEach(function(t){ if(!byDay[t.d]){byDay[t.d]=[];days.push(t.d)} byDay[t.d].push(t) });
+    days.sort().reverse();
+    days.forEach(function(d){
+      var list=byDay[d], dOut=sum(list,'e'), dIn=sum(list,'i');
+      h+='<div class="day"><div class="dayh"><span class="d">'+esc(dayLabel(d))+'</span>'
+       + '<span class="t money">'+(dOut?'\u2212'+money(dOut):'')+(dIn?(dOut?'  ':'')+'+'+money(dIn):'')+'</span></div>'
+       + '<div class="entries">';
+      list.forEach(function(t){h+=entRow(t)});
+      h+='</div></div>';
+    });
+  }
+  $('#v-log').innerHTML=h;
+  var qi=$('#logq');
+  if(qi)qi.addEventListener('input',function(){
+    logQ=qi.value;
+    var pos=qi.selectionStart;
+    renderLog();
+    var n=$('#logq'); if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
+  });
+}
+
+/* ================= TRENDS ================= */
+var treMode='m', treAnchor=new Date();
+function renderTre(){
+  var r=range(treMode,treAnchor);
+  var rows=pick(r), out=sum(rows,'e'), inc=sum(rows,'i');
+  var prevA=shift(treMode,treAnchor,-1), pr=range(treMode,prevA);
+  var pOut=sum(pick(pr),'e');
+  var atNow=range(treMode,new Date()).from===r.from;
+
+  var h='<div class="card tight">';
+  h+='<div class="seg" style="grid-template-columns:repeat(3,1fr)">'+['w','m','y'].map(function(k){
+    return '<button data-act="tmode" data-m="'+k+'" aria-selected="'+(treMode===k)+'">'+PER[k]+'</button>';
+  }).join('')+'</div>';
+  h+='<div class="pnav"><button data-act="tshift" data-n="-1">\u2039</button>'
+   + '<span class="lbl">'+esc(r.label)+'</span>'
+   + '<button data-act="tshift" data-n="1"'+(atNow?' disabled':'')+'>\u203a</button></div></div>';
+
+  /* headline: what you spent, and whether that is more or less than the period before */
+  var delta=out-pOut;
+  var pct=pOut>0?Math.round(delta/pOut*100):null;
+  h+='<div class="card"><div class="ttl">Spent</div>';
+  h+='<div class="big money">'+money(out)+'</div>';
+  if(pOut>0){
+    h+='<div class="sm mut" style="margin-top:3px">'
+     + (delta===0?'Same as last '+PER[treMode].toLowerCase()
+        : (delta>0?'\u25b2 ':'\u25bc ')+moneyR(Math.abs(delta))+' ('+Math.abs(pct)+'%) '
+          +(delta>0?'more':'less')+' than last '+PER[treMode].toLowerCase())+'</div>';
+  }else if(!rows.length){
+    h+='<div class="sm mut" style="margin-top:3px">Nothing recorded in this period.</div>';
+  }
+  var dayCount=Math.min(spanDays(r), atNow?Math.round((new Date()-parseISO(r.from))/86400000)+1:spanDays(r));
+  if(out>0&&dayCount>0){
+    h+='<div class="sm mut" style="margin-top:2px">'+moneyR(out/dayCount)+' a day on average'
+     + (inc>0?' \u00b7 '+moneyR(inc)+' came in':'')+'</div>';
+  }
+  h+='</div>';
+
+  /* last six periods, so the current one has something to sit against */
+  var cols=[];
+  for(var i=5;i>=0;i--){
+    var a=shift(treMode,treAnchor,-i), rr=range(treMode,a);
+    cols.push({v:sum(pick(rr),'e'),lb:shortLabel(treMode,a),now:i===0});
+  }
+  var max=Math.max.apply(null,cols.map(function(c){return c.v}).concat([1]));
+  h+='<div class="card"><div class="ttl">Last six</div><div class="spark">';
+  cols.forEach(function(c){
+    h+='<div class="col'+(c.now?' now':'')+'">'
+     + '<div class="xs mut b">'+(c.v?fmt(c.v).replace(/\.\d+$/,''):'')+'</div>'
+     + '<div class="bx" style="height:'+Math.max(2,Math.round(c.v/max*58))+'px"></div>'
+     + '<div class="lb">'+esc(c.lb)+'</div></div>';
+  });
+  h+='</div></div>';
+
+  /* where it went */
+  var by={};
+  rows.forEach(function(t){ if(t.k!=='e')return; by[t.c]=(by[t.c]||0)+t.p });
+  var cats=Object.keys(by).map(function(id){return {id:id,v:by[id]}})
+            .sort(function(a,b){return b.v-a.v});
+  if(cats.length){
+    h+='<div class="card"><div class="ttl">Where it went</div>';
+    cats.forEach(function(c){
+      var share=Math.round(c.v/out*100);
+      h+='<div class="brow"><div class="ell"><span style="margin-right:6px">'+esc(catIc(c.id))+'</span>'
+       + esc(catName(c.id))+'</div>'
+       + '<div class="right"><span class="b money">'+money(c.v)+'</span> <span class="xs mut">'+share+'%</span></div>'
+       + '<div class="btrack"><div class="bfill" style="width:'+share+'%"></div></div></div>';
+    });
+    h+='</div>';
+  }
+  $('#v-tre').innerHTML=h;
+}
+function shortLabel(mode,a){
+  if(mode==='w')return a.getDate()+'/'+(a.getMonth()+1);
+  if(mode==='m')return MON[a.getMonth()];
+  return String(a.getFullYear()).slice(2);
+}
+
+/* ================= SETUP ================= */
+function renderSet(){
+  var h='';
+  h+='<div class="card"><div class="ttl">Categories</div>';
+  ['e','i'].forEach(function(k){
+    h+='<div class="sm b mut" style="margin:8px 0 4px">'+(k==='e'?'Spending':'Income')+'</div><div class="entries">';
+    catsOf(k).forEach(function(c){
+      h+='<button class="ent" data-act="editcat" data-id="'+c.id+'">'
+       + '<span class="ic">'+esc(c.ic)+'</span><span class="grow ell"><span class="nm">'+esc(c.name)+'</span></span>'
+       + '<span class="xs mut">'+plural(S.tx.filter(function(t){return t.c===c.id}).length,'entry','entries')+'</span></button>';
+    });
+    h+='</div>';
+  });
+  h+='<button class="btn ghost full sm2" style="margin-top:10px" data-act="newcat">Add a category</button></div>';
+
+  h+='<div class="card"><div class="ttl">Repeats every month</div>';
+  if(!S.rec.length){
+    h+='<div class="sm mut">Rent, mobile pack, subscriptions. Set one up and it records itself on the day you choose.</div>';
+  }else{
+    h+='<div class="entries">';
+    S.rec.forEach(function(r){
+      h+='<button class="ent" data-act="editrec" data-id="'+r.id+'">'
+       + '<span class="ic">'+esc(catIc(r.c))+'</span>'
+       + '<span class="grow ell"><span class="nm">'+esc(r.name)+'</span><br><span class="nt">Day '+r.day+' of each month</span></span>'
+       + '<span class="am money'+(r.k==='i'?' pos':'')+'">'+(r.k==='i'?'+':'')+money(r.p)+'</span></button>';
+    });
+    h+='</div>';
+  }
+  h+='<button class="btn ghost full sm2" style="margin-top:10px" data-act="newrec">Add a repeat</button></div>';
+
+  h+='<div class="card"><div class="ttl">Your data</div>'
+   + '<div class="sm mut" style="margin-bottom:9px">'+plural(S.tx.length,'entry','entries')+', stored on this phone only. '
+   + 'Nothing is uploaded anywhere, so keep a backup if you value it.</div>'
+   + '<div class="row" style="flex-wrap:wrap">'
+   + '<button class="btn ghost sm2" data-act="csv">Export spreadsheet</button>'
+   + '<button class="btn ghost sm2" data-act="backup">Save backup</button>'
+   + '<button class="btn ghost sm2" data-act="restore">Restore backup</button></div>'
+   + '<input type="file" id="restoreFile" accept="application/json,.json" hidden></div>';
+
+  h+='<div class="card"><div class="ttl">Settings</div>'
+   + '<div class="fld"><label>Currency symbol</label><input id="curInput" value="'+esc(cur())+'" maxlength="3"></div>'
+   + '<div class="fld"><label>Appearance</label><div class="seg" style="grid-template-columns:repeat(3,1fr)">'
+   + ['auto','light','dark'].map(function(t){
+       return '<button data-act="theme" data-t="'+t+'" aria-selected="'+((S.theme||'auto')===t)+'">'
+         + t.charAt(0).toUpperCase()+t.slice(1)+'</button>'}).join('')
+   + '</div></div></div>';
+
+  h+='<div class="card"><div class="ttl">Offline</div><div id="offline" class="sm mut">Checking\u2026</div>'
+   + '<button class="btn ghost full sm2" style="margin-top:9px" data-act="recheck">Check again</button></div>';
+
+  h+='<div class="card"><button class="btn dang full sm2" data-act="wipe">Delete everything</button></div>';
+
+  $('#v-set').innerHTML=h;
+  var ci=$('#curInput');
+  if(ci)ci.addEventListener('change',function(){S.cur=ci.value||'\u20b9';save();toast('Currency updated')});
+  var rf=$('#restoreFile');
+  if(rf)rf.addEventListener('change',doRestore);
+  checkOffline();
+}
+
+/* ================= SHEETS ================= */
+function closeSheet(){$('#sheet').classList.remove('on');$('#scrim').classList.remove('on');$('#sheet').innerHTML=''}
+function openSheet(html){
+  $('#sheet').innerHTML=html; $('#sheet').classList.add('on'); $('#scrim').classList.add('on');
+  $('#sheet').scrollTop=0;
+}
+function sheetHead(title){
+  return '<div class="sheeth"><h3>'+esc(title)+'</h3><button class="iconbtn" data-act="close">\u2715</button></div>';
+}
+function catOptions(k,sel){
+  return catsOf(k).map(function(c){
+    return '<option value="'+c.id+'"'+(c.id===sel?' selected':'')+'>'+esc(c.ic+' '+c.name)+'</option>';
+  }).join('');
+}
+
+function editTx(id){
+  var t=null;
+  for(var i=0;i<S.tx.length;i++)if(S.tx[i].id===id)t=S.tx[i];
+  if(!t)return;
+  var h=sheetHead('Edit entry');
+  h+='<div class="fld"><label>Amount</label><input id="eAmt" type="number" inputmode="decimal" step="0.01" value="'+fromP(t.p)+'"></div>';
+  h+='<div class="fld"><label>Kind</label><div class="seg" style="grid-template-columns:1fr 1fr">'
+   + '<button data-act="ekind" data-k="e" aria-selected="'+(t.k==='e')+'">Spent</button>'
+   + '<button data-act="ekind" data-k="i" aria-selected="'+(t.k==='i')+'">Received</button></div></div>';
+  h+='<div class="fld"><label>Category</label><select id="eCat">'+catOptions(t.k,t.c)+'</select></div>';
+  h+='<div class="fld"><label>Date</label><input id="eDate" type="date" value="'+t.d+'"></div>';
+  h+='<div class="fld"><label>Note</label><input id="eNote" value="'+esc(t.n||'')+'" placeholder="Optional"></div>';
+  h+='<button class="btn full" style="margin-top:8px" data-act="saveEdit" data-id="'+id+'">Save changes</button>';
+  h+='<button class="btn dang full sm2" style="margin-top:8px" data-act="delTx" data-id="'+id+'">Delete entry</button>';
+  openSheet(h);
+  $('#sheet').dataset.k=t.k;
+}
+function saveEdit(id){
+  var t=null,i;
+  for(i=0;i<S.tx.length;i++)if(S.tx[i].id===id)t=S.tx[i];
+  if(!t)return;
+  var p=toP($('#eAmt').value);
+  if(!(p>0)){toast('Enter an amount above zero');return}
+  mark('edit');
+  t.p=p; t.k=$('#sheet').dataset.k||t.k; t.c=$('#eCat').value;
+  t.d=$('#eDate').value||t.d; t.n=$('#eNote').value.trim();
+  save(); closeSheet(); render(); toast('Entry updated',true);
+}
+function delTx(id){
+  mark('delete');
+  S.tx=S.tx.filter(function(t){return t.id!==id});
+  save(); closeSheet(); render(); toast('Entry deleted',true);
+}
+
+var EMOJI=['\ud83c\udf5b','\u2615','\ud83c\udf5e','\ud83d\ude8c','\u26fd','\ud83d\uded2','\ud83d\udcf1','\ud83d\udcda','\ud83c\udfe0','\ud83d\udc8a','\ud83d\udc55','\ud83c\udfae','\ud83c\udf81','\ud83d\udcb5','\ud83c\udf93','\u2702','\ud83d\udd27','\ud83d\udc36','\u2708','\u2022'];
+function editCat(id){
+  var c=id?catOf(id):null;
+  var kind=c?c.k:(view==='add'?draft.k:'e');
+  var h=sheetHead(c?'Edit category':'New category');
+  h+='<div class="fld"><label>Name</label><input id="cName" value="'+esc(c?c.name:'')+'" placeholder="e.g. Chai"></div>';
+  if(!c){
+    h+='<div class="fld"><label>Kind</label><div class="seg" style="grid-template-columns:1fr 1fr">'
+     + '<button data-act="ckind" data-k="e" aria-selected="'+(kind==='e')+'">Spending</button>'
+     + '<button data-act="ckind" data-k="i" aria-selected="'+(kind==='i')+'">Income</button></div></div>';
+  }
+  h+='<div class="fld"><label>Icon</label><div class="chips" id="emo">'
+   + EMOJI.map(function(e){return '<button class="chip" data-act="emo" data-e="'+e+'" aria-selected="'
+       +((c?c.ic:'\u2022')===e)+'">'+e+'</button>'}).join('')+'</div></div>';
+  h+='<button class="btn full" style="margin-top:8px" data-act="saveCat" data-id="'+(id||'')+'">'
+   + (c?'Save changes':'Add category')+'</button>';
+  if(c&&catsOf(c.k).length>1){
+    h+='<button class="btn dang full sm2" style="margin-top:8px" data-act="delCat" data-id="'+id+'">Delete category</button>';
+  }
+  openSheet(h);
+  var s=$('#sheet'); s.dataset.k=kind; s.dataset.ic=c?c.ic:'\u2022';
+}
+function saveCat(id){
+  var s=$('#sheet'), name=$('#cName').value.trim();
+  if(!name){toast('Give the category a name');return}
+  mark('category');
+  if(id){var c=catOf(id); c.name=name; c.ic=s.dataset.ic;}
+  else{
+    var nc={id:uid(),name:name,ic:s.dataset.ic||'\u2022',k:s.dataset.k||'e'};
+    S.cats.push(nc);
+    if(view==='add'&&nc.k===draft.k)draft.c=nc.id;
+  }
+  save(); closeSheet(); render(); toast(id?'Category updated':'Category added');
+}
+function delCat(id){
+  var used=S.tx.filter(function(t){return t.c===id}).length;
+  if(used){toast(used+' entries use this category - move them first');return}
+  mark('category');
+  S.cats=S.cats.filter(function(c){return c.id!==id});
+  save(); closeSheet(); render(); toast('Category deleted',true);
+}
+
+function editRec(id){
+  var r=null;
+  for(var i=0;i<S.rec.length;i++)if(S.rec[i].id===id)r=S.rec[i];
+  var k=r?r.k:'e';
+  var h=sheetHead(r?'Edit repeat':'New monthly repeat');
+  h+='<div class="fld"><label>What is it</label><input id="rName" value="'+esc(r?r.name:'')+'" placeholder="e.g. Room rent"></div>';
+  h+='<div class="fld"><label>Amount</label><input id="rAmt" type="number" inputmode="decimal" step="0.01" value="'+(r?fromP(r.p):'')+'"></div>';
+  h+='<div class="fld"><label>Kind</label><div class="seg" style="grid-template-columns:1fr 1fr">'
+   + '<button data-act="rkind" data-k="e" aria-selected="'+(k==='e')+'">Spending</button>'
+   + '<button data-act="rkind" data-k="i" aria-selected="'+(k==='i')+'">Income</button></div></div>';
+  h+='<div class="fld"><label>Category</label><select id="rCat">'+catOptions(k,r?r.c:null)+'</select></div>';
+  h+='<div class="fld"><label>Day of the month</label><input id="rDay" type="number" min="1" max="31" value="'+(r?r.day:1)+'"></div>';
+  h+='<div class="sm mut">Recorded automatically when you open the app on or after that day. It starts from this month, not earlier ones.</div>';
+  h+='<button class="btn full" style="margin-top:10px" data-act="saveRec" data-id="'+(id||'')+'">'+(r?'Save changes':'Add repeat')+'</button>';
+  if(r)h+='<button class="btn dang full sm2" style="margin-top:8px" data-act="delRec" data-id="'+id+'">Delete repeat</button>';
+  openSheet(h);
+  $('#sheet').dataset.k=k;
+}
+function saveRec(id){
+  var name=$('#rName').value.trim(), p=toP($('#rAmt').value), day=Math.max(1,Math.min(31,parseInt($('#rDay').value,10)||1));
+  if(!name){toast('Give the repeat a name');return}
+  if(!(p>0)){toast('Enter an amount above zero');return}
+  mark('repeat');
+  if(id){
+    for(var i=0;i<S.rec.length;i++)if(S.rec[i].id===id){
+      S.rec[i].name=name;S.rec[i].p=p;S.rec[i].day=day;
+      S.rec[i].k=$('#sheet').dataset.k;S.rec[i].c=$('#rCat').value;
+    }
+  }else{
+    S.rec.push({id:uid(),name:name,p:p,day:day,k:$('#sheet').dataset.k||'e',c:$('#rCat').value,last:''});
+  }
+  save(); runRecurring(); closeSheet(); render(); toast(id?'Repeat updated':'Repeat added');
+}
+function delRec(id){
+  mark('repeat');
+  S.rec=S.rec.filter(function(r){return r.id!==id});
+  save(); closeSheet(); render(); toast('Repeat deleted',true);
+}
+
+/* ================= EXPORT / BACKUP ================= */
+function dl(name,text,mime){
+  try{
+    var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url)},1500);
+    return true;
+  }catch(e){return false}
+}
+function csvCell(v){
+  var s=String(v==null?'':v);
+  return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function doCSV(){
+  if(!S.tx.length){toast('Nothing to export yet');return}
+  var rows=[['Date','Kind','Category','Amount','Note']];
+  S.tx.slice().sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0}).forEach(function(t){
+    rows.push([t.d, t.k==='i'?'Income':'Spend', catName(t.c), fromP(t.p).toFixed(2), t.n||'']);
+  });
+  var csv=rows.map(function(r){return r.map(csvCell).join(',')}).join('\r\n');
+  /* BOM so Excel opens rupee symbols and Urdu/Hindi notes without mangling them */
+  dl('khata-'+today()+'.csv','\ufeff'+csv,'text/csv;charset=utf-8')
+    ? toast('Spreadsheet exported') : toast('Export failed on this browser');
+}
+function doBackup(){
+  dl('khata-backup-'+today()+'.json',JSON.stringify(S),'application/json')
+    ? toast('Backup saved') : toast('Backup failed on this browser');
+}
+function doRestore(e){
+  var f=e.target.files&&e.target.files[0];
+  if(!f)return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{
+      var o=JSON.parse(fr.result);
+      if(!o||!o.tx||!o.cats)throw new Error('shape');
+      mark('restore');
+      S=o; if(!S.rec)S.rec=[]; if(!S.cur)S.cur='\u20b9';
+      save(); applyTheme(); render();
+      toast('Restored '+S.tx.length+' entries',true);
+    }catch(err){ toast('That file is not a KHATA backup'); }
+    e.target.value='';
+  };
+  fr.onerror=function(){toast('Could not read that file');e.target.value=''};
+  fr.readAsText(f);
+}
+function wipe(){
+  var h=sheetHead('Delete everything');
+  h+='<div class="sm">This removes all '+S.tx.length+' entries, your categories and your repeats from this phone. '
+   + 'There is no copy anywhere else, so it cannot be recovered unless you saved a backup.</div>';
+  h+='<button class="btn ghost full sm2" style="margin-top:12px" data-act="backup">Save a backup first</button>';
+  h+='<button class="btn dang full" style="margin-top:8px" data-act="wipeYes">Delete everything</button>';
+  openSheet(h);
+}
+
+/* ================= THEME ================= */
+function applyTheme(){
+  var t=S.theme||'auto', dark;
+  if(t==='auto'){
+    dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }else dark=(t==='dark');
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  var m=document.querySelector('meta[name=theme-color]');
+  if(m)m.setAttribute('content',dark?'#14110f':'#efece6');
+}
+if(window.matchMedia){
+  try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){
+    if((S&&S.theme||'auto')==='auto')applyTheme();
+  })}catch(e){}
+}
+
+/* ================= EVENTS ================= */
+document.addEventListener('click',function(ev){
+  var el=ev.target.closest ? ev.target.closest('[data-act],[data-v]') : null;
+  if(!el)return;
+  var a=el.dataset.act;
+  if(el.dataset.v&&!a){go(el.dataset.v);return}
+  switch(a){
+    case 'kind': draft.k=el.dataset.k; draft.c=null; renderAdd(); break;
+    case 'cat': draft.c=el.dataset.id; renderAdd(); break;
+    case 'key': keyPress(el.dataset.t); break;
+    case 'date': draft.d=el.dataset.d; renderAdd(); break;
+    case 'pickdate': pickDate(); break;
+    case 'note': noteSheet(); break;
+    case 'saveTx': saveTx(); break;
+    case 'edit': editTx(el.dataset.id); break;
+    case 'saveEdit': saveEdit(el.dataset.id); break;
+    case 'delTx': delTx(el.dataset.id); break;
+    case 'ekind': case 'ckind': case 'rkind': {
+      $('#sheet').dataset.k=el.dataset.k;
+      var g=el.parentNode; $$('button',g).forEach(function(b){
+        b.setAttribute('aria-selected',String(b===el))});
+      var sel=$('#eCat')||$('#rCat');
+      if(sel)sel.innerHTML=catOptions(el.dataset.k,null);
+      break;
+    }
+    case 'emo': {
+      $('#sheet').dataset.ic=el.dataset.e;
+      $$('#emo .chip').forEach(function(b){b.setAttribute('aria-selected',String(b===el))});
+      break;
+    }
+    case 'newcat': editCat(null); break;
+    case 'editcat': editCat(el.dataset.id); break;
+    case 'saveCat': saveCat(el.dataset.id); break;
+    case 'delCat': delCat(el.dataset.id); break;
+    case 'newrec': editRec(null); break;
+    case 'editrec': editRec(el.dataset.id); break;
+    case 'saveRec': saveRec(el.dataset.id); break;
+    case 'delRec': delRec(el.dataset.id); break;
+    case 'lmode': logMode=el.dataset.m; logAnchor=new Date(); renderLog(); break;
+    case 'lshift': logAnchor=shift(logMode,logAnchor,+el.dataset.n); renderLog(); break;
+    case 'tmode': treMode=el.dataset.m; treAnchor=new Date(); renderTre(); break;
+    case 'tshift': treAnchor=shift(treMode,treAnchor,+el.dataset.n); renderTre(); break;
+    case 'csv': doCSV(); break;
+    case 'backup': doBackup(); break;
+    case 'restore': $('#restoreFile').click(); break;
+    case 'wipe': wipe(); break;
+    case 'wipeYes': S=JSON.parse(JSON.stringify(DEF)); save(); closeSheet(); go('add'); toast('Everything deleted'); break;
+    case 'theme': S.theme=el.dataset.t; save(); applyTheme(); renderSet(); break;
+    case 'recheck': checkOffline(true); break;
+    case 'close': closeSheet(); break;
+  }
+});
+$('#scrim').addEventListener('click',closeSheet);
+$('#toastB').addEventListener('click',doUndo);
+$('#themeBtn').addEventListener('click',function(){
+  var order=['auto','light','dark'], i=order.indexOf(S.theme||'auto');
+  S.theme=order[(i+1)%3]; save(); applyTheme();
+  toast('Appearance: '+S.theme);
+  if(view==='set')renderSet();
+});
+
+function pickDate(){
+  var h=sheetHead('Pick a date');
+  h+='<div class="fld"><input id="pDate" type="date" value="'+draft.d+'" max="'+today()+'"></div>';
+  h+='<button class="btn full" data-act="close" id="pOk">Use this date</button>';
+  openSheet(h);
+  $('#pOk').addEventListener('click',function(){draft.d=$('#pDate').value||today();renderAdd()});
+}
+function noteSheet(){
+  var h=sheetHead('Note');
+  h+='<div class="fld"><input id="nText" value="'+esc(draft.n)+'" placeholder="What was it for?"></div>';
+  h+='<button class="btn full" data-act="close" id="nOk">Save note</button>';
+  openSheet(h);
+  setTimeout(function(){var n=$('#nText');if(n)n.focus()},60);
+  $('#nOk').addEventListener('click',function(){draft.n=$('#nText').value.trim();renderAdd()});
+}
+
+/* ================= OFFLINE ================= */
+var CACHE='khata-v1';
+var SHELL_REQ=['./'];
+var SHELL_OPT=['./index.html','./manifest.webmanifest','./icon.svg','./icon-180.png'];
+function cachedAt(u){
+  return caches.match(new URL(u,location.href).href,{ignoreSearch:true})
+    .then(function(m){return !!m})['catch'](function(){return false});
+}
+function healAt(u){
+  return fetch(new URL(u,location.href).href,{cache:'no-store'}).then(function(res){
+    if(!res||!res.ok)return 'not on the server ('+(res?res.status:'?')+')';
+    return caches.open(CACHE).then(function(c){
+      return c.put(new URL(u,location.href).href,res).then(function(){return 'saved now'});
+    });
+  })['catch'](function(){return 'no connection'});
+}
+function checkOffline(loud){
+  var box=$('#offline'); if(!box)return;
+  if(!('serviceWorker' in navigator)||!window.caches){
+    box.innerHTML='<span style="color:var(--bad)">This browser cannot store the app offline.</span>';
+    return;
+  }
+  box.textContent='Checking\u2026';
+  var rows=[], ok=true;
+  var chain=Promise.resolve();
+  SHELL_REQ.concat(SHELL_OPT).forEach(function(u){
+    var need=SHELL_REQ.indexOf(u)>=0;
+    chain=chain.then(function(){
+      return cachedAt(u).then(function(hit){
+        if(hit){rows.push([u,'stored']);return}
+        return healAt(u).then(function(r){
+          var got=(r==='saved now');
+          rows.push([u,got?r:(need?r:r+' (optional)')]);
+          if(!got&&need)ok=false;
+        });
+      });
+    });
+  });
+  chain=chain.then(function(){
+    return cachedAt(location.pathname).then(function(hit){
+      if(hit){rows.push(['this page','stored']);return}
+      return healAt(location.pathname).then(function(r){
+        rows.push(['this page',r]);
+        if(r!=='saved now')ok=false;
+      });
+    });
+  });
+  chain.then(function(){
+    if(!navigator.serviceWorker.controller){rows.unshift(['worker','not running yet']);ok=false}
+    var head=ok
+      ? '<span style="color:var(--in);font-weight:700">Ready. You can turn the internet off.</span>'
+      : '<span style="color:var(--bad);font-weight:700">Not ready offline yet.</span>';
+    var body=rows.map(function(r){
+      return '<div style="display:flex;justify-content:space-between;gap:10px"><span>'+esc(r[0])+'</span>'
+        + '<span style="opacity:.7;white-space:nowrap">'+esc(r[1])+'</span></div>';
+    }).join('');
+    var hint=ok?'' : '<div style="margin-top:6px">Open this page once with a connection, then close and reopen it.</div>';
+    box.innerHTML=head+'<div style="margin-top:6px">'+body+'</div>'+hint;
+    if(loud)toast(ok?'Ready to work offline':'Still not ready offline');
+  });
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    try{navigator.serviceWorker.register('sw.js')['catch'](function(){})}catch(e){}
+  });
+}
+
+/* ================= BOOT ================= */
+load();
+applyTheme();
+var posted=runRecurring();
+go('add');
+if(posted)toast(posted+(posted===1?' repeat was':' repeats were')+' recorded');
+</script>
+</body>
+</html>
